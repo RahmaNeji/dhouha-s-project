@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_app/features/user_auth/service/database.dart';
 
 class Details extends StatefulWidget {
   String image, name, description, documentId;
   bool favorite;
-  Details(
-      {required this.documentId,
-      required this.description,
-      required this.image,
-      required this.name,
-      required this.favorite});
+  Details({
+    required this.documentId,
+    required this.description,
+    required this.image,
+    required this.name,
+    required this.favorite,
+  });
 
   @override
   State<Details> createState() => _DetailsState();
@@ -18,8 +18,10 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
   void _toggleFavoriteStatus() async {
-    await DatabaseMethods()
-        .updateFavoriteStatus(widget.documentId, !widget.favorite);
+    await DatabaseMethods().updateFavoriteStatus(
+      widget.documentId,
+      !widget.favorite,
+    ); // Add userId here
 
     setState(() {
       widget.favorite = !widget.favorite;
@@ -33,7 +35,7 @@ class _DetailsState extends State<Details> {
       body: Container(
         margin: EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(30),
@@ -57,29 +59,17 @@ class _DetailsState extends State<Details> {
                 fontSize: 20,
               ),
             ),
-            widget.favorite
-                ? Positioned(
-                    left: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _toggleFavoriteStatus();
-                      },
-                      child: Text("Delete from Favorite"),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey),
-                    ),
-                  )
-                : Positioned(
-                    left: 200,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _toggleFavoriteStatus();
-                      },
-                      child: Text("Add To Favorite"),
-                      style:
-                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    ),
-                  )
+            SizedBox(
+              height: 20.0,
+            ),
+            ElevatedButton(
+              onPressed: _toggleFavoriteStatus,
+              child: Text(
+                  widget.favorite ? "Delete from Favorite" : "Add To Favorite"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: widget.favorite ? Colors.grey : Colors.red,
+              ),
+            ),
           ],
         ),
       ),

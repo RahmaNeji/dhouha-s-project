@@ -192,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
     if (user != null) {
       showToast(message: "Utilisateur connecté avec succès");
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainPage()));
+          context, MaterialPageRoute(builder: (context) => MainPage(userId: user.uid)));
     } else {
       showToast(
           message:
@@ -206,34 +206,47 @@ class _LoginPageState extends State<LoginPage> {
     return emailRegex.hasMatch(email);
   }
 
-  _signInWithGoogle() async {
-    final GoogleSignIn _googleSignIn = GoogleSignIn();
+ _signInWithGoogle() async {
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-    try {
-      if (_firebaseAuth.currentUser != null) {
-        await _firebaseAuth.signOut();
-      }
-      if (_googleSignIn.currentUser != null) {
-        await _googleSignIn.disconnect();
-      }
-      final GoogleSignInAccount? googleSignInAccount =
-          await _googleSignIn.signIn();
-
-      if (googleSignInAccount != null) {
-        final GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount.authentication;
-
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          idToken: googleSignInAuthentication.idToken,
-          accessToken: googleSignInAuthentication.accessToken,
-        );
-
-        await _firebaseAuth.signInWithCredential(credential);
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MainPage()));
-      } else {}
-    } catch (e) {
-      showToast(message: "some error occured $e");
+  try {
+    if (_firebaseAuth.currentUser != null) {
+      await _firebaseAuth.signOut();
     }
+    if (_googleSignIn.currentUser != null) {
+      await _googleSignIn.disconnect();
+    }
+    final GoogleSignInAccount? googleSignInAccount =
+        await _googleSignIn.signIn();
+
+    if (googleSignInAccount != null) {
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleSignInAuthentication.idToken,
+        accessToken: googleSignInAuthentication.accessToken,
+      );
+
+      // Sign in with Google credential
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+
+      // Get the user ID from the userCredential
+      String userId = userCredential.user!.uid;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainPage(userId: userId), // Pass userId here
+        ),
+      );
+    } else {
+      // Handle if googleSignInAccount is null
+    }
+  } catch (e) {
+    showToast(message: "some error occured $e");
   }
+}
+
 }

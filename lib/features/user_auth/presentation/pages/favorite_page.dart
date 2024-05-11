@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/features/user_auth/presentation/widgets/drawer.dart';
 
 class FavoritePage extends StatefulWidget {
-  const FavoritePage({super.key});
+  final String userId;
+  const FavoritePage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<FavoritePage> createState() => _FavoritePageState();
@@ -27,7 +28,9 @@ class _FavoritePageState extends State<FavoritePage> {
       'Sousse',
       'Nabeul',
       'Mahdia',
-      'Bizerte'
+      'Bizerte',
+      'Manouba',
+      'SidiBouzid'
     ];
 
     collectionNames.forEach((collection) {

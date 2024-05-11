@@ -42,9 +42,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      
                       Image.asset('images/TunisiaApp.jpg'),
-
                       const SizedBox(
                         height: 18,
                       ),
@@ -156,7 +154,11 @@ class _SignUpPageState extends State<SignUpPage> {
     if (user != null) {
       showToast(message: "Utilisateur créé avec succès");
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainPage()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainPage(
+                    userId: user.uid,
+                  )));
     } else {
       showToast(
           message:

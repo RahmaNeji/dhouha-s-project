@@ -18,10 +18,16 @@ class DatabaseMethods {
   Future<void> updateFavoriteStatus(
       String documentId, bool favoriteStatus) async {
     try {
-      // Try to update the document in each collection
-      await Future.forEach(
-          ['Tunis', 'Tozeur', 'Sousse', 'Nabeul', 'Mahdia', 'Bizerte'],
-          (collection) async {
+      await Future.forEach([
+        'Tunis',
+        'Tozeur',
+        'Sousse',
+        'Nabeul',
+        'Mahdia',
+        'Bizerte',
+        'Manouba',
+        'SidiBouzid'
+      ], (collection) async {
         final docSnapshot = await FirebaseFirestore.instance
             .collection(collection)
             .doc(documentId)
@@ -36,8 +42,42 @@ class DatabaseMethods {
         }
       });
     } catch (e) {
-      // Handle any errors or exceptions
       print('Error updating favorite status: $e');
+    }
+  }
+
+  Future<void> deletePlaceItem(String documentId) async {
+    try {
+      await Future.forEach(
+        [
+          'Tunis',
+          'Tozeur',
+          'Sousse',
+          'Nabeul',
+          'Mahdia',
+          'Bizerte',
+          'Manouba',
+          'SidiBouzid'
+        ],
+        (collection) async {
+          final documentReference =
+              FirebaseFirestore.instance.collection(collection).doc(documentId);
+
+          final docSnapshot = await documentReference.get();
+
+          if (docSnapshot.exists) {
+            await documentReference.delete();
+            print(
+                'Document $documentId deleted successfully from collection $collection');
+          } else {
+            print(
+                'Document $documentId does not exist in collection $collection');
+          }
+        },
+      );
+    } catch (e) {
+      print('Error deleting document: $e');
+      // Handle error as needed
     }
   }
 }

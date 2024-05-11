@@ -7,20 +7,29 @@ import 'package:provider/provider.dart';
 import '../../../../provider/provider.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final String userId; 
+  const MainPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  final List<Widget> _pages = [HomePage(), AddPage(), FavoritePage()];
+   late List<Widget> _pages;
 
   int _currentIndex = 0;
 
   get googleSignIn => null;
 
   @override
+  void initState() {
+   _pages = [
+      HomePage(userId: widget.userId),
+      AddPage(userId: widget.userId),
+      FavoritePage(userId: widget.userId),
+    ];
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<UiProvider>(builder: (context, notifier, child) {

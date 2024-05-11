@@ -7,7 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 
 class AddPage extends StatefulWidget {
-  const AddPage({super.key});
+  final String userId;
+  const AddPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<AddPage> createState() => _AddPageState();
@@ -20,17 +21,20 @@ class _AddPageState extends State<AddPage> {
     'Bizerte',
     'Tozeur',
     'Mahdia',
-    'Tunis'
+    'Tunis',
+    'Manouba',
+    'SidiBouzid'
   ];
   String? value;
-  TextEditingController namecontroller = new TextEditingController();
-  TextEditingController descrpcontroller = new TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController descrController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
+  final _formKey = GlobalKey<FormState>();
 
   void clearFields() {
-    namecontroller.clear();
-    descrpcontroller.clear();
+    nameController.clear();
+    descrController.clear();
     selectedImage = null;
     setState(() {});
   }
@@ -43,32 +47,32 @@ class _AddPageState extends State<AddPage> {
   }
 
   uploadItem() async {
-    if (selectedImage != null &&
-        namecontroller.text != "" &&
-        descrpcontroller.text != "") {
-      String addId = randomAlphaNumeric(10);
+    if (_formKey.currentState!.validate()) {
+      if (selectedImage != null) {
+        String addId = randomAlphaNumeric(10);
 
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child("blogImages").child(addId);
-      final UploadTask task = firebaseStorageRef.putFile(selectedImage!);
+        Reference firebaseStorageRef =
+            FirebaseStorage.instance.ref().child("blogImages").child(addId);
+        final UploadTask task = firebaseStorageRef.putFile(selectedImage!);
 
-      var downloadUrl = await (await task).ref.getDownloadURL();
+        var downloadUrl = await (await task).ref.getDownloadURL();
 
-      Map<String, dynamic> addItem = {
-        "Image": downloadUrl,
-        "Name": namecontroller.text,
-        "Description": descrpcontroller.text,
-        "Favorite": false
-      };
-      await DatabaseMethods().addCountryItem(addItem, value!).then((value) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.orangeAccent,
-            content: Text(
-              "Country Item has been added Successfully",
-              style: TextStyle(fontSize: 18.0),
-            )));
-        clearFields();
-      });
+        Map<String, dynamic> addItem = {
+          "Image": downloadUrl,
+          "Name": nameController.text,
+          "Description": descrController.text,
+          "Favorite": false
+        };
+        await DatabaseMethods().addCountryItem(addItem, value!).then((value) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.orangeAccent,
+              content: Text(
+                "Country Item has been added Successfully",
+                style: TextStyle(fontSize: 18.0),
+              )));
+          clearFields();
+        });
+      }
     }
   }
 
@@ -78,11 +82,9 @@ class _AddPageState extends State<AddPage> {
       appBar: AppBar(
         title: Text("Add Page"),
       ),
-      drawer: MyDrawer(),
       body: SingleChildScrollView(
-        child: Container(
-          margin:
-              EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0, bottom: 50.0),
+        child: Form(
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -154,8 +156,14 @@ class _AddPageState extends State<AddPage> {
                 decoration: BoxDecoration(
                     color: Color(0xFFececf8),
                     borderRadius: BorderRadius.circular(10)),
-                child: TextField(
-                  controller: namecontroller,
+                child: TextFormField(
+                  controller: nameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a place name';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: "Enter Place Name",
@@ -177,9 +185,15 @@ class _AddPageState extends State<AddPage> {
                 decoration: BoxDecoration(
                     color: Color(0xFFececf8),
                     borderRadius: BorderRadius.circular(10)),
-                child: TextField(
+                child: TextFormField(
+                  controller: descrController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a place description';
+                    }
+                    return null;
+                  },
                   maxLines: 6,
-                  controller: descrpcontroller,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: "Enter Place Detail",
